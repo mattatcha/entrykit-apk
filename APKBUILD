@@ -10,7 +10,7 @@ license="MIT"
 depends=""
 depends_dev=""
 makedepends="go"
-install="$pkgname.post-install"
+install="$pkgname.post-install $pkgname.post-deinstall"
 subpackages=""
 source="$pkgname-$pkgver.tar.gz::https://github.com/progrium/$pkgname/archive/v$pkgver.tar.gz"
 
@@ -19,10 +19,10 @@ _builddir="$srcdir/go/src/github.com/progrium/$pkgname"
 build() {
   export GOPATH="$srcdir/go"
   mkdir -p $_builddir
-  ln -sf "$srcdir/$pkgname-$pkgver"/* "$_builddir"
+  ln -sf $srcdir/$pkgname-$pkgver/* "$_builddir"
 
   cd "$_builddir"
-  go get -d ./cmd
+  go get -d -v ./cmd || return 1
   go build -a -ldflags "-X main.Version=$pkgver" -o bin/$pkgname ./cmd || return 1
 }
 

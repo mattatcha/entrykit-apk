@@ -1,4 +1,2 @@
 #!/bin/sh
-
-# We need the symlinks early
 exec /usr/bin/entrykit --symlink
