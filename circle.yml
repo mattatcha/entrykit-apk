@@ -1,0 +1,34 @@
+general:
+  artifacts:
+    - packages
+
+machine:
+  services:
+    - docker
+
+dependencies:
+  pre:
+    - git fetch --tags
+    - go get github.com/tcnksm/ghr
+    - mkdir packages
+    - echo -e "$RSA_PUBLIC_KEY" > packages/matt@lanciv.com.rsa.pub
+  override:
+    - docker run -e RSA_PRIVATE_KEY="$RSA_PRIVATE_KEY" -e RSA_PRIVATE_KEY_NAME="matt@lanciv.com.rsa" -v $(pwd):/home/builder/package -v $(pwd)/packages:/home/builder/packages andyshinn/alpine-abuild
+
+test:
+  override:
+    - docker run -it -v $(pwd)/packages:/packages gliderlabs/alpine:3.3 sh -c "cp /packages/andyshinn.rsa.pub /etc/apk/keys/ && apk -U add --no-progress --upgrade /packages/builder/x86_64/*.apk"
+
+deployment:
+  release:
+    tag: /[0-9]+(\.[0-9]+){1,2}(\-r\d+)?$/
+    owner: mattaitchison
+    commands:
+      - ghr -u mattaitchison $CIRCLE_TAG packages/
+      - ghr -u mattaitchison $CIRCLE_TAG packages/builder/x86_64
+  master:
+    branch: master
+    owner: mattaitchison
+    commands:
+      - ghr -u mattaitchison --prerelease --delete unreleased packages
+      - ghr -u mattaitchison --prerelease unreleased packages/builder/x86_64
