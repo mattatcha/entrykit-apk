@@ -2,7 +2,7 @@
 # Maintainer: Randall Leeds <randall@bleeds.info>
 pkgname=entrykit
 pkgver=0.4.0
-pkgrel=1
+pkgrel=0
 pkgdesc="Entrypoint tools for elegant, programmable containers"
 url="https://github.com/progrium/entrykit"
 arch="all"
